@@ -5,17 +5,167 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Page Title</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        overflow: hidden;
+      }
+
+      .messages {
+      }
+
+      .message {
+        margin-bottom: 20px;
+        overflow: hidden;
+      }
+
+      .message .avatar {
+        float: left;
+        margin-right: 10px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #ccc;
+      }
+
+      .message .text {
+        float: left;
+        padding: 10px;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+      }
+
+      .message .text p {
+        margin: 0;
+      }
+
+      .message.me .avatar {
+        float: right;
+        margin-left: 10px;
+      }
+
+      .message.me .text {
+        float: right;
+        background-color: #0d6efd;
+        color: #fff;
+      }
+
+      .message.me .text p {
+        color: #fff;
+      }
+
+      .form {
+        margin-top: 20px;
+        overflow: hidden;
+        display: flex;
+      }
+
+      .form input[type="text"] {
+        float: left;
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        margin-right: 10px;
+        font-size: 16px;
+      }
+
+      .form button {
+        float: left;
+        padding: 10px 20px;
+        background-color: #0d6efd;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+    </style>
   </head>
   <body>
-    <h4>chat page</h4>
-    <button id="send" onClick="socket.send('hi')">Send</button>
-
+    <div class="container">
+      <div class="messages">
+        <div class="message">
+          <div class="avatar"></div>
+          <div class="text">
+            <p>Hello, how can I help you today?</p>
+          </div>
+        </div>
+        <div class="message me">
+          <div class="avatar"></div>
+          <div class="text">
+            <p>Hi, I have a question about your products.</p>
+          </div>
+        </div>
+        <div class="message">
+          <div class="avatar"></div>
+          <div class="text">
+            <p>Sure, what would you like to know?</p>
+          </div>
+        </div>
+      </div>
+      <div class="form">
+        <input type="text" id="input" placeholder="Type your message here..." />
+        <button id="send">Send</button>
+      </div>
+    </div>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script>
-      let socket = new WebSocket("ws://localhost:8081");
+      var socket = io();
+      // let socket = new WebSocket("ws://localhost:8081");
+      document.querySelector("#send").addEventListener("click", function () {
+        socket.emit("chat message", document.querySelector("#input").value);
+        // socket.send(document.querySelector("#input").value);
+        var template = `<div class="message me">
+        <div class="avatar"></div>
+        <div class="text">
+          <p>${document.querySelector("#input").value}</p>
+        </div>
+      </div>`;
 
-      socket.onmessage = function (event) {
-        console.log(event);
-      };
+        document
+          .querySelector(".messages")
+          .insertAdjacentHTML("beforeend", template);
+
+        document.querySelector("#input").value = "";
+      });
+
+      socket.on("chat message", function (msg) {
+        var template = `<div class="message">
+          <div class="avatar"></div>
+          <div class="text">
+            <p>${msg}</p>
+          </div>
+        </div>`;
+
+        document
+          .querySelector(".messages")
+          .insertAdjacentHTML("beforeend", template);
+      });
+
+      // socket.onmessage = function (event) {
+      //   console.log(event.data);
+      //   var template = `<div class="message">
+      //     <div class="avatar"></div>
+      //     <div class="text">
+      //       <p>${event.data}</p>
+      //     </div>
+      //   </div>`;
+
+      //   document
+      //     .querySelector(".messages")
+      //     .insertAdjacentHTML("beforeend", template);
+      // };
     </script>
   </body>
 </html>
