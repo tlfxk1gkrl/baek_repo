@@ -5,6 +5,14 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 
+//openAI
+const { Configuration, OpenAIApi } = require("openai");
+
+const configuration = new Configuration({
+  apiKey: "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",
+});
+const openai = new OpenAIApi(configuration);
+
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
@@ -15,13 +23,21 @@ io.on("connection", (socket) => {
 
   //disconnect
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    console.log(socket.id + "user disconnected");
   });
 
   //get message
-  socket.on("chat message", (msg) => {
-    console.log("message : " + msg);
-    io.emit("chat message", msg);
+  socket.on("chat message", async (msg) => {
+    const response = await openai.createCompletion({
+      model: "text-davinci-003",
+      prompt: msg,
+      temperature: 0.7,
+      max_tokens: 256,
+      top_p: 1,
+      frequency_penalty: 0,
+      presence_penalty: 0,
+    });
+    io.emit("chat message", response.data.choices[0].text);
   });
 });
 
