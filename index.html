@@ -95,43 +95,83 @@
   <body>
     <div class="container">
       <div class="messages"></div>
-      <div class="form">
+      <from class="form">
         <input type="text" id="input" placeholder="Type your message here..." />
         <button id="send">Send</button>
-      </div>
+      </from>
     </div>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script>
       var socket = io();
+      var lan;
       // let socket = new WebSocket("ws://localhost:8081");
       document.querySelector("#send").addEventListener("click", function () {
-        socket.emit("chat message", document.querySelector("#input").value);
-        // socket.send(document.querySelector("#input").value);
-        var template = `<div class="message me">
-        <div class="avatar"></div>
-        <div class="text">
-          <p>${document.querySelector("#input").value}</p>
-        </div>
-      </div>`;
+        const msg = document.querySelector("#input").value;
 
-        document
-          .querySelector(".messages")
-          .insertAdjacentHTML("beforeend", template);
+        fetch("/detectLangs", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            data: msg,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            lan = data.langCode;
+            const trmsg = { lan: lan, msg: msg };
+            fetch("/translate", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(trmsg),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                socket.emit("chat message", data.message.result.translatedText);
+                // socket.send(document.querySelector("#input").value);
+                var template = `<div class="message me">
+                                 <div class="avatar"></div>
+                                <div class="text">
+                           <p>${document.querySelector("#input").value}</p>
+                          </div>
+                          </div>`;
+                document
+                  .querySelector(".messages")
+                  .insertAdjacentHTML("beforeend", template);
 
-        document.querySelector("#input").value = "";
+                document.querySelector("#input").value = "";
+              })
+              .catch((error) => console.log(error));
+          })
+          .catch((error) => console.log(error));
       });
 
       socket.on("chat message", function (msg) {
-        var template = `<div class="message">
+        const trmsg = { lan: lan, msg: msg };
+        fetch("/returntranslate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(trmsg),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            var template = `<div class="message">
           <div class="avatar"></div>
           <div class="text">
-            <p>${msg}</p>
+            <p>${data.message.result.translatedText}</p>
           </div>
         </div>`;
 
-        document
-          .querySelector(".messages")
-          .insertAdjacentHTML("beforeend", template);
+            document
+              .querySelector(".messages")
+              .insertAdjacentHTML("beforeend", template);
+          })
+          .catch((error) => console.log(error));
       });
 
       // socket.onmessage = function (event) {
