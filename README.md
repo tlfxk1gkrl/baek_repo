@@ -13,5 +13,7 @@ app.listen(8080);
 
 ## Setup
 
-set process.env.OPENAI_API_KEY="openAI_API_KEY"
+set process.env.OPENAI_API_KEY=
+set process.env.process.env.NAVER_CLIENT_ID=
+set process.env.process.env.NAVER_CLIENT_KEY=
 node server.js
