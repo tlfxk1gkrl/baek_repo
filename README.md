@@ -12,11 +12,10 @@ res.sendFile(\_\_dirname + 'index.html');
 app.listen(8080);
 
 ## Setup
-
-set process.env.OPENAI_API_KEY=
-set process.env.NAVER_CLIENT_ID=
-set process.env.NAVER_CLIENT_KEY=
-node server.js
+1. create .env file
+2.  set process.env.OPENAI_API_KEY=
+    set process.env.NAVER_CLIENT_ID=
+    set process.env.NAVER_CLIENT_KEY=
 
 ## 230306
 
