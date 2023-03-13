@@ -54,7 +54,7 @@ socket.on("chat message", function (msg) {
   })
     .then((response) => response.json())
     .then((data) => {
-      console.log(data.message.result.translatedText);
+      console.log(data);
       const template = `<div class="message">
     <div class="avatar"></div>
     <div class="text">
