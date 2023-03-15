@@ -23,7 +23,7 @@ const openai = new OpenAIApi(configuration);
 app.use(express.static("src"));
 
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/src/main.html");
+  res.sendFile(__dirname + "/src/login.html");
 });
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -133,8 +133,20 @@ io.on("connection", (socket) => {
   });
 });
 
+//login
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+
+  //Login Processing
+  res.json({ message: "Success" });
+});
+
+//chat page
+app.get("/chat", (req, res) => {
+  res.sendFile(__dirname + "/src/main.html");
+});
+
 server.listen(3000, () => {
   console.log("listening on *:3000");
 });
-
-
